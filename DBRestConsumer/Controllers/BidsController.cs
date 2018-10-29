@@ -109,8 +109,24 @@ namespace DBRestConsumer.Controllers
 
         // PUT: api/Bids/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public int Put(int id, [FromBody] Bid value)
         {
+            string putString = "UPDATE Bid SET item = @item, price = @price, [name] = @name WHERE id = @id;";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                using (SqlCommand command = new SqlCommand(putString, conn))
+                {
+                    command.Parameters.AddWithValue("@id", id);
+                    command.Parameters.AddWithValue("@item", value.Item);
+                    command.Parameters.AddWithValue("@price", value.Price);
+                    command.Parameters.AddWithValue("@name", value.Name);
+
+                    int rowAffected = command.ExecuteNonQuery();
+                    return rowAffected;
+                }
+            }
         }
 
         // DELETE: api/ApiWithActions/5
